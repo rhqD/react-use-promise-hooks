@@ -5,13 +5,13 @@
 Using npm:
 
 ```sh
-$ npm install --save react-use-promise-hook
+$ npm install --save react-use-promise-hooks
 ```
 
 Using yarn:
 
 ```sh
-$ yarn add react-use-promise-hook
+$ yarn add react-use-promise-hooks
 ```
 
 ## Intro
