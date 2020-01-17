@@ -1,4 +1,4 @@
-# react-use-promise-hook
+# react-use-promise-hooks
 
 ## Installation
 
