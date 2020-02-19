@@ -1,14 +1,29 @@
 import { useMemo, useState } from 'react';
 
-const usePromise = (executorCreator, deps) => {
-    const executor = useMemo(executorCreator, deps);
-    const [hook, setHook] = useState({});
-    const { resolve, reject } = hook;
-    const promiseCreator = useMemo(() => (...args) => new Promise((re, rj) => {
-        setHook({ resolve: re, reject: rj });
-        executor(...args);
-    }), [executor]);
-    return [promiseCreator, resolve, reject];
-};
+export const usePromise = (executorCreator, deps) => {
+  const executor = useMemo(executorCreator, deps);
+  const [{ hook, undo }, setMeta] = useState({ hook: {}, undo: null });
+  const { resolve, reject } = hook;
 
-export default usePromise;
+  const wrappedResolve = useMemo(() => () => {
+    if (typeof undo === 'function') {
+      undo();
+    }
+    resolve();
+  }, [undo, resolve]);
+
+  const wrappedReject = useMemo(() => () => {
+    if (typeof undo === 'function') {
+      undo();
+    }
+    reject();
+  }, [undo, reject]);
+
+  const promiseCreator = useMemo(() => (...args) => new Promise((re, rj) => {
+    setMeta({
+      hook: { resolve: re, reject: rj },
+      undo: executor(...args),
+    });
+  }), [executor, setMeta]);
+  return [promiseCreator, wrappedResolve, wrappedReject];
+};
